@@ -1,6 +1,6 @@
 (function () {
   window.AIService = {
-    sendMessage: function (userText, imageDataUrl, requestId) {
+    sendMessage: function (userText, requestId) {
       const currentEmotions = window.EmotionService.getEmotions();
       const userPersona = window.UserPersona.get();
       const recentMessages = window.Conversation.getRecent(5);
@@ -19,7 +19,6 @@
       return window.ServerConnector.sendPromptPayload({
         contextText: fullContext,
         userText: userText,
-        imageDataUrl: imageDataUrl,
         requestId: requestId
       });
     }
