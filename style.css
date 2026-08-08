@@ -1,11 +1,11 @@
 :root {
-  --bg-root: #0a0b0d;
-  --bg-header: #111216;
-  --bg-surface: #141519;
-  --bg-card: #1a1c22;
-  --bg-input: #121317;
+  --bg-root: #000000;
+  --bg-header: #000000;
+  --bg-surface: #0a0b0e;
+  --bg-card: #12141a;
+  --bg-input: #0e1014;
   
-  --border-color: #262830;
+  --border-color: #1e2029;
   
   --accent-primary: #0000FF;
   --accent-hover: #3333ff;
@@ -15,7 +15,7 @@
   --text-muted: #9a968d;
   --text-dim: #68655e;
 
-  --user-bubble-bg: #22252e;
+  --user-bubble-bg: #161820;
   --user-bubble-text: #ece8e1;
   --ai-bubble-text: #e1ddd5;
 
@@ -64,6 +64,7 @@ html, body {
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  background-color: var(--bg-root);
 }
 
 #appHeader {
@@ -71,7 +72,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   height: 54px;
-  padding: 0 20px;
+  padding: 0 24px;
   background-color: var(--bg-header);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
@@ -89,7 +90,6 @@ html, body {
   background-color: var(--accent-primary);
   transform: rotate(45deg);
   border-radius: 2px;
-  box-shadow: 0 0 8px rgba(0, 0, 255, 0.6);
 }
 
 .brand-title {
@@ -98,17 +98,6 @@ html, body {
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--text-main);
-}
-
-.brand-tag {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 2px 6px;
-  background-color: var(--accent-muted);
-  color: var(--accent-primary);
-  border-radius: 4px;
-  font-weight: 600;
 }
 
 #connectionIndicator {
@@ -129,7 +118,6 @@ html, body {
 
 #statusDot.status-online {
   background-color: #38b000;
-  box-shadow: 0 0 6px rgba(56, 176, 0, 0.4);
 }
 
 #statusDot.status-offline {
@@ -140,6 +128,9 @@ html, body {
   display: flex;
   flex: 1;
   min-height: 0;
+  padding: 16px;
+  gap: 16px;
+  background-color: var(--bg-root);
 }
 
 #chatSection {
@@ -147,8 +138,10 @@ html, body {
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  background-color: var(--bg-root);
-  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 #chatBox {
@@ -237,7 +230,7 @@ html, body {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
-  background-color: #0d0e11;
+  background-color: #050608;
 }
 
 .code-block-head {
@@ -334,7 +327,7 @@ html, body {
   align-items: flex-end;
   gap: 10px;
   padding: 16px 24px;
-  background-color: var(--bg-header);
+  background-color: var(--bg-surface);
   border-top: 1px solid var(--border-color);
 }
 
@@ -392,10 +385,10 @@ html, body {
 
 #chatFooter {
   display: flex;
-  justify-content: space-between;
-  padding: 6px 24px;
-  background-color: var(--bg-header);
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  justify-content: flex-end;
+  padding: 8px 24px;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
   font-size: 11px;
   color: var(--text-dim);
 }
@@ -404,6 +397,9 @@ html, body {
   width: 340px;
   flex-shrink: 0;
   background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -462,9 +458,7 @@ html, body {
 }
 
 .companion-subtext {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
+  display: none;
 }
 
 .panel-block {
@@ -562,7 +556,7 @@ html, body {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s;
 }
 
 .model-card-option:hover {
@@ -593,24 +587,6 @@ html, body {
   font-size: 11.5px;
   color: var(--text-muted);
   line-height: 1.4;
-}
-
-.badge {
-  font-size: 9px;
-  text-transform: uppercase;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-weight: 700;
-}
-
-.badge-recommended {
-  background-color: var(--accent-muted);
-  color: var(--accent-primary);
-}
-
-.badge-fast {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
 }
 
 .persona-display {
@@ -727,16 +703,12 @@ html, body {
 @media (max-width: 860px) {
   #appBody {
     flex-direction: column;
+    padding: 10px;
+    gap: 10px;
   }
   
   #companionPanel {
     width: 100%;
     height: 280px;
-    border-top: 1px solid var(--border-color);
-    border-left: none;
-  }
-
-  #chatSection {
-    border-right: none;
   }
 }
