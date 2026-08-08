@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xaida AI</title>
+  <title>Xaikra AI</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -12,73 +12,153 @@
 </head>
 <body>
 
-<div id="appShell">
-
-  <header id="topBar">
-    <div id="brandName">Xaida AI</div>
-    <button id="modelSwitchButton" type="button">
-      <span id="activeModelLabel">Xaida 2.1</span>
-      <span class="chevron">&#9662;</span>
-    </button>
-    <div id="serverIndicator">
-      <span id="serverDot"></span>
-      <span id="serverStatusText">Connecting</span>
+<div id="appContainer">
+  <header id="appHeader">
+    <div class="brand-group">
+      <div class="brand-symbol"></div>
+      <h1 class="brand-title">Xaikra AI</h1>
+    </div>
+    
+    <div id="connectionIndicator">
+      <span id="statusDot"></span>
+      <span id="statusText">Initializing</span>
     </div>
   </header>
 
-  <main id="chatPage" class="page page-visible">
-    <div id="chatBox">
-      <div id="emptyChatState">
-        <h1>Ask Xaida anything</h1>
-        <p>Research, coding, image scanning, math, assignments, and image generation.</p>
+  <div id="appBody">
+    <section id="chatSection">
+      <div id="chatBox"></div>
+
+      <div id="attachmentPreview" hidden>
+        <img id="attachmentThumb" alt="Preview attachment">
+        <div class="attachment-info">
+          <span id="attachmentName">Image attached</span>
+          <button id="removeAttachmentButton" type="button">Remove</button>
+        </div>
       </div>
-    </div>
 
-    <div id="composerBar">
-      <label id="attachButton" for="imageAttachInput" title="Attach image">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-      </label>
-      <input type="file" id="imageAttachInput" accept="image/*" hidden>
-      <textarea id="messageInput" rows="1" placeholder="Type a message..."></textarea>
-      <button id="sendButton" type="button" disabled>Send</button>
-    </div>
+      <div id="composer">
+        <label id="attachButton" for="imageInput" title="Attach file">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </label>
+        <input type="file" id="imageInput" accept="image/*" hidden>
+        
+        <textarea id="messageInput" rows="1" placeholder="Talk with Xaikra..."></textarea>
+        
+        <button id="sendButton" type="button" disabled>
+          <span>Send</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
 
-    <div id="attachmentPreview" hidden>
-      <img id="attachmentThumb" alt="Attached reference">
-      <button id="removeAttachmentButton" type="button">Remove</button>
-    </div>
+      <footer id="chatFooter">
+        <span>Xaikra AI Core Engine</span>
+        <span>Created by booz</span>
+      </footer>
+    </section>
 
-    <footer id="creditLine">Created by : booz</footer>
-  </main>
-
-  <section id="modelPage" class="page">
-    <div id="modelPageInner">
-      <h2>Select a model</h2>
-
-      <button class="model-card" type="button" data-model="xaida-2.1" data-available="true">
-        <div class="model-card-head">
-          <span class="model-name">Xaida 2.1</span>
-          <span class="model-tag tag-ready">General</span>
+    <aside id="companionPanel">
+      <div class="panel-scroll">
+        <div class="avatar-card">
+          <div class="avatar-frame">
+            <img id="companionAvatar" src="Images/Basic.png" alt="Xaikra">
+            <span class="avatar-status-badge"></span>
+          </div>
+          <h2 id="companionName">Xaikra</h2>
+          <span id="companionSubtext" class="companion-subtext">AI Companion</span>
         </div>
-        <p class="model-desc">Great for research, coding, image scanning, math, assignments, and image generation.</p>
-      </button>
 
-      <button class="model-card" type="button" data-model="xaida-1.3" data-available="false">
-        <div class="model-card-head">
-          <span class="model-name">Xaida 1.3</span>
-          <span class="model-tag tag-soon">Coming soon</span>
+        <div class="panel-block">
+          <div class="block-header">
+            <h3>Emotional State</h3>
+          </div>
+          <div id="emotionsContainer" class="emotions-list"></div>
         </div>
-        <p class="model-desc">Perfect for roleplay, consistent long term and short term memory, and stays in character. [It's not available yet, coming soon]</p>
-      </button>
 
-      <button id="closeModelPageButton" type="button">Back to chat</button>
-    </div>
-  </section>
+        <div class="panel-block">
+          <div class="block-header">
+            <h3>Model Architecture</h3>
+          </div>
+          <div class="model-selector-group">
+            <label class="model-card-option">
+              <input type="radio" name="modelChoice" value="xaikra-2.1" checked>
+              <div class="model-card-content">
+                <div class="model-card-title">
+                  <strong>Xaikra 2.1</strong>
+                  <span class="badge badge-recommended">Recommended</span>
+                </div>
+                <p>High consistency, deep memory retention, consistent character persona.</p>
+              </div>
+            </label>
 
+            <label class="model-card-option">
+              <input type="radio" name="modelChoice" value="xaikra-1.3">
+              <div class="model-card-content">
+                <div class="model-card-title">
+                  <strong>Xaikra 1.3</strong>
+                  <span class="badge badge-fast">Fast</span>
+                </div>
+                <p>Faster execution, lightweight responses, may occasionally wander context.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-block">
+          <div class="block-header">
+            <h3>User Persona</h3>
+            <button id="togglePersonaEdit" type="button" class="btn-text">Edit</button>
+          </div>
+
+          <div id="personaDisplay" class="persona-display">
+            <div class="persona-field">
+              <span class="field-label">Name</span>
+              <span id="personaNameValue" class="field-value">User</span>
+            </div>
+            <div class="persona-field">
+              <span class="field-label">Gender</span>
+              <span id="personaGenderValue" class="field-value">Not specified</span>
+            </div>
+            <div class="persona-field">
+              <span class="field-label">Backstory</span>
+              <p id="personaBackstoryValue" class="field-value-block">No backstory provided yet.</p>
+            </div>
+          </div>
+
+          <form id="personaForm" class="persona-form" hidden>
+            <div class="form-group">
+              <label for="personaNameInput">Name</label>
+              <input type="text" id="personaNameInput" placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label for="personaGenderInput">Gender</label>
+              <input type="text" id="personaGenderInput" placeholder="Your gender">
+            </div>
+            <div class="form-group">
+              <label for="personaBackstoryInput">Backstory</label>
+              <textarea id="personaBackstoryInput" rows="3" placeholder="Brief backstory or details..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button id="savePersonaButton" type="button" class="btn-primary">Save Persona</button>
+              <button id="cancelPersonaButton" type="button" class="btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </aside>
+  </div>
 </div>
 
-<script src="serverConnector.js"></script>
-<script src="messages.js"></script>
-<script src="setup.js"></script>
+<script src="config/aiPersonality.js"></script>
+<script src="data/userPersona.js"></script>
+<script src="data/conversation.js"></script>
+<script src="services/emotionService.js"></script>
+<script src="services/memoryService.js"></script>
+<script src="services/contextBuilder.js"></script>
+<script src="services/serverConnector.js"></script>
+<script src="services/aiService.js"></script>
+<script src="js/companionPanel.js"></script>
+<script src="js/chatView.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
