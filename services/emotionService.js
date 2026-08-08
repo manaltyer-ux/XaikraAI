@@ -1,6 +1,6 @@
 (function () {
   const defaultEmotions = {
-    respect: 0,
+    respect: 5,
     curiosity: 50,
     mood: 65,
     affection: 0,
@@ -16,13 +16,24 @@
     },
 
     updateEmotions: function (newEmotions) {
+      if (!newEmotions || typeof newEmotions !== "object") return;
+      
+      let hasChanged = false;
       Object.keys(newEmotions).forEach(function (key) {
-        if (key in currentEmotions) {
-          const val = Math.max(0, Math.min(100, Math.round(newEmotions[key])));
-          currentEmotions[key] = val;
+        const lowerKey = key.toLowerCase();
+        if (lowerKey in currentEmotions) {
+          const parsedVal = parseInt(newEmotions[key], 10);
+          if (!isNaN(parsedVal)) {
+            const val = Math.max(0, Math.min(100, parsedVal));
+            currentEmotions[lowerKey] = val;
+            hasChanged = true;
+          }
         }
       });
-      listeners.forEach(function (cb) { cb(currentEmotions); });
+
+      if (hasChanged) {
+        listeners.forEach(function (cb) { cb(Object.assign({}, currentEmotions)); });
+      }
     },
 
     subscribe: function (callback) {
