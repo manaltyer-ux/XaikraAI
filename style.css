@@ -20,6 +20,7 @@
   --ai-bubble-text: #e1ddd5;
 
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Georgia", "Times New Roman", serif;
   --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
 }
 
@@ -72,7 +73,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   height: 54px;
-  padding: 0 24px;
+  padding: 0 28px;
   background-color: var(--bg-header);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
@@ -81,12 +82,12 @@ html, body {
 .brand-group {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .brand-symbol {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background-color: var(--accent-primary);
   transform: rotate(45deg);
   border-radius: 2px;
@@ -96,7 +97,7 @@ html, body {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.2px;
   color: var(--text-main);
 }
 
@@ -104,13 +105,13 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-muted);
 }
 
 #statusDot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: #4a4d5a;
   transition: background-color 0.3s;
@@ -128,8 +129,8 @@ html, body {
   display: flex;
   flex: 1;
   min-height: 0;
-  padding: 16px;
-  gap: 16px;
+  padding: 16px 20px 20px 20px;
+  gap: 18px;
   background-color: var(--bg-root);
 }
 
@@ -140,7 +141,7 @@ html, body {
   min-width: 0;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 18px 12px 18px 18px;
   overflow: hidden;
 }
 
@@ -148,10 +149,10 @@ html, body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 .chat-row {
@@ -179,11 +180,11 @@ html, body {
 }
 
 .bubble-user {
-  padding: 12px 16px;
+  padding: 11px 16px;
   background-color: var(--user-bubble-bg);
   color: var(--user-bubble-text);
   border: 1px solid var(--border-color);
-  border-radius: 12px 12px 2px 12px;
+  border-radius: 14px 14px 3px 14px;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
@@ -307,42 +308,42 @@ html, body {
 }
 
 .note-line {
-  align-self: center;
-  font-size: 11.5px;
+  align-self: flex-start;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
   color: var(--text-muted);
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  padding: 4px 12px;
-  border-radius: 12px;
+  border-left: 2px solid var(--accent-primary);
+  padding: 2px 0 2px 10px;
+  background: transparent;
 }
 
 .note-line.note-error {
   color: #ff6b6b;
-  border-color: rgba(255, 107, 107, 0.3);
-  background-color: rgba(255, 107, 107, 0.08);
+  border-left-color: #ff6b6b;
 }
 
 #composer {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
-  padding: 16px 24px;
+  gap: 12px;
+  padding: 16px 24px 20px 24px;
   background-color: var(--bg-surface);
   border-top: 1px solid var(--border-color);
 }
 
 #messageInput {
   flex: 1;
-  min-height: 38px;
+  min-height: 40px;
   max-height: 140px;
   resize: none;
-  padding: 8px 12px;
+  padding: 9px 14px;
   font-family: inherit;
   font-size: 14px;
   color: var(--text-main);
   background-color: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px 4px 12px 12px;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -355,14 +356,14 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 38px;
-  padding: 0 16px;
+  height: 40px;
+  padding: 0 18px;
   font-size: 13px;
   font-weight: 600;
   color: #ffffff;
   background-color: var(--accent-primary);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color 0.2s;
@@ -379,26 +380,25 @@ html, body {
 }
 
 #sendButton:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 #chatFooter {
   display: flex;
   justify-content: flex-end;
-  padding: 8px 24px;
+  padding: 6px 24px;
   background-color: var(--bg-surface);
-  border-top: 1px solid var(--border-color);
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-dim);
 }
 
 #companionPanel {
-  width: 340px;
+  width: 330px;
   flex-shrink: 0;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -407,30 +407,37 @@ html, body {
 .panel-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 26px;
 }
 
 .avatar-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding-top: 10px;
+  padding-bottom: 8px;
 }
 
 .avatar-frame {
   position: relative;
-  width: 96px;
-  height: 96px;
-  border-radius: 16px;
-  overflow: hidden;
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
   border: 1px solid var(--border-color);
   background-color: var(--bg-card);
   margin-bottom: 12px;
+  margin-top: -6px;
+  transform: rotate(-2.5deg);
+  transition: transform 0.3s ease;
+}
+
+.avatar-frame:hover {
+  transform: rotate(0deg);
 }
 
 .avatar-frame img {
@@ -441,10 +448,10 @@ html, body {
 
 .avatar-status-badge {
   position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 10px;
-  height: 10px;
+  bottom: 4px;
+  right: 4px;
+  width: 9px;
+  height: 9px;
   background-color: #38b000;
   border: 2px solid var(--bg-surface);
   border-radius: 50%;
@@ -455,6 +462,16 @@ html, body {
   font-size: 18px;
   font-weight: 700;
   color: var(--text-main);
+  letter-spacing: -0.3px;
+}
+
+.avatar-quote {
+  margin: 6px 0 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.3;
 }
 
 .companion-subtext {
@@ -467,6 +484,10 @@ html, body {
   gap: 12px;
 }
 
+.block-persona {
+  padding-top: 6px;
+}
+
 .block-header {
   display: flex;
   align-items: center;
@@ -475,11 +496,37 @@ html, body {
 
 .block-header h3 {
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.9px;
   color: var(--text-muted);
   font-weight: 600;
+}
+
+.header-featured {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  color: var(--text-main) !important;
+  letter-spacing: -0.2px !important;
+  position: relative;
+  padding-left: 10px;
+}
+
+.header-featured::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+  width: 3px;
+  background-color: var(--accent-primary);
+  border-radius: 2px;
+}
+
+.header-minimal {
+  font-size: 11px !important;
+  color: var(--text-dim) !important;
 }
 
 .btn-text {
@@ -526,7 +573,7 @@ html, body {
 }
 
 .emotion-bar-bg {
-  height: 6px;
+  height: 5px;
   width: 100%;
   background-color: var(--bg-card);
   border-radius: 3px;
@@ -544,19 +591,25 @@ html, body {
 .model-selector-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .model-card-option {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 11px 12px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.model-card-option:first-child {
+  margin-left: -5px;
+  padding-left: 14px;
+  border-left: 3px solid var(--accent-primary);
 }
 
 .model-card-option:hover {
@@ -593,10 +646,10 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px;
+  padding: 12px 14px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px 4px 10px 10px;
 }
 
 .persona-field {
@@ -606,7 +659,7 @@ html, body {
 }
 
 .field-label {
-  font-size: 10.5px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-dim);
@@ -710,5 +763,9 @@ html, body {
   #companionPanel {
     width: 100%;
     height: 280px;
+  }
+
+  .model-card-option:first-child {
+    margin-left: 0;
   }
 }
