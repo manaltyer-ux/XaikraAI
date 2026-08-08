@@ -7,9 +7,9 @@
   
   --border-color: #262830;
   
-  --accent-primary: #d95d28;
-  --accent-hover: #eb6b34;
-  --accent-muted: rgba(217, 93, 40, 0.16);
+  --accent-primary: #0000FF;
+  --accent-hover: #3333ff;
+  --accent-muted: rgba(0, 0, 255, 0.16);
   
   --text-main: #ece8e1;
   --text-muted: #9a968d;
@@ -25,6 +25,26 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #262830 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262830;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0000FF;
 }
 
 html, body {
@@ -69,6 +89,7 @@ html, body {
   background-color: var(--accent-primary);
   transform: rotate(45deg);
   border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0, 0, 255, 0.6);
 }
 
 .brand-title {
@@ -102,7 +123,7 @@ html, body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #e0a030;
+  background-color: #4a4d5a;
   transition: background-color 0.3s;
 }
 
@@ -545,7 +566,7 @@ html, body {
 }
 
 .model-card-option:hover {
-  border-color: rgba(217, 93, 40, 0.4);
+  border-color: rgba(0, 0, 255, 0.4);
 }
 
 .model-card-option input[type="radio"] {
