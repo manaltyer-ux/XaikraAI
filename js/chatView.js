@@ -2,10 +2,6 @@
   const chatBox = document.getElementById("chatBox");
   const messageInput = document.getElementById("messageInput");
   const sendButton = document.getElementById("sendButton");
-  const imageInput = document.getElementById("imageInput");
-  const attachmentPreview = document.getElementById("attachmentPreview");
-  const attachmentThumb = document.getElementById("attachmentThumb");
-  const removeAttachmentButton = document.getElementById("removeAttachmentButton");
 
   let activeRequestId = null;
   let activeAiBubble = null;
@@ -14,60 +10,19 @@
   let displayedMarkdown = "";
   let typingAnimationId = null;
   let isResponseComplete = false;
-  let attachedImageDataUrl = null;
   let stallTimer = null;
 
   if (typeof marked !== "undefined" && marked.setOptions) {
     marked.setOptions({ breaks: true, gfm: true });
   }
 
-  function compressImage(file, maxWidth, maxHeight, quality, callback) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const img = new Image();
-      img.onload = function () {
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth || height > maxHeight) {
-          if (width / height > maxWidth / maxHeight) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          } else {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
-        callback(compressedDataUrl);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
   function scrollChatToBottom() {
     if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  function addUserRow(userText, imageDataUrl) {
+  function addUserRow(userText) {
     const row = document.createElement("div");
     row.className = "chat-row row-user";
-
-    if (imageDataUrl) {
-      const referenceImage = document.createElement("img");
-      referenceImage.className = "user-attached-image";
-      referenceImage.src = imageDataUrl;
-      referenceImage.alt = "Attached photo";
-      row.appendChild(referenceImage);
-    }
 
     if (userText) {
       const bubble = document.createElement("div");
@@ -198,7 +153,7 @@
       if (!activeRequestId) return;
       if (typingAnimationId) cancelAnimationFrame(typingAnimationId);
       if (activeAiBubble) {
-        activeAiBubble.textContent = "Connection stalled while generating response.";
+        activeAiBubble.textContent = "Connection timed out while waiting for AI response.";
       }
       addNoteLine("Request timed out.", true);
       finishRequest();
@@ -228,27 +183,21 @@
     }
   }
 
-  function clearAttachment() {
-    attachedImageDataUrl = null;
-    if (imageInput) imageInput.value = "";
-    if (attachmentPreview) attachmentPreview.hidden = true;
-  }
-
   function sendCurrentMessage() {
     const userText = messageInput.value.trim();
-    if ((!userText && !attachedImageDataUrl) || activeRequestId || !window.ServerConnector.isReady()) return;
+    if (!userText || activeRequestId || !window.ServerConnector.isReady()) return;
 
     activeRequestId = "req-" + Date.now() + "-" + Math.random().toString(36).substring(2, 6);
     targetMarkdown = "";
     displayedMarkdown = "";
     isResponseComplete = false;
 
-    addUserRow(userText, attachedImageDataUrl);
-    window.Conversation.add("user", userText || "[Attached Image]");
+    addUserRow(userText);
+    window.Conversation.add("user", userText);
 
     activeAiBubble = addAiBubble();
 
-    const wasSent = window.AIService.sendMessage(userText, attachedImageDataUrl, activeRequestId);
+    const wasSent = window.AIService.sendMessage(userText, activeRequestId);
 
     if (!wasSent) {
       if (activeAiBubble) activeAiBubble.textContent = "Unable to route message to Xaikra AI server.";
@@ -258,7 +207,6 @@
 
     messageInput.value = "";
     messageInput.style.height = "auto";
-    clearAttachment();
     refreshSendAvailability();
     resetStallTimer();
   }
@@ -360,21 +308,6 @@
         messageInput.style.height = Math.min(messageInput.scrollHeight, 140) + "px";
       });
     }
-
-    if (imageInput) {
-      imageInput.addEventListener("change", function () {
-        const pickedFile = imageInput.files && imageInput.files[0];
-        if (!pickedFile) return;
-
-        compressImage(pickedFile, 800, 800, 0.7, function (compressedDataUrl) {
-          attachedImageDataUrl = compressedDataUrl;
-          if (attachmentThumb) attachmentThumb.src = attachedImageDataUrl;
-          if (attachmentPreview) attachmentPreview.hidden = false;
-        });
-      });
-    }
-
-    if (removeAttachmentButton) removeAttachmentButton.addEventListener("click", clearAttachment);
   }
 
   window.ChatView = {
