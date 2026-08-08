@@ -1,10 +1,10 @@
 (function () {
   const defaultEmotions = {
-    respect: 78,
-    curiosity: 91,
+    respect: 0,
+    curiosity: 50,
     mood: 65,
-    affection: 43,
-    trust: 72
+    affection: 0,
+    trust: 0
   };
 
   let currentEmotions = Object.assign({}, defaultEmotions);
