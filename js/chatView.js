@@ -95,7 +95,7 @@
   }
 
   function renderMarkdownText(text) {
-    if (!activeAiBubble || activeAiBubble.dataset.isImage === "true") return;
+    if (!activeAiBubble) return;
 
     if (typeof marked !== "undefined" && marked.parse) {
       activeAiBubble.innerHTML = marked.parse(text);
@@ -110,7 +110,7 @@
     if (typingAnimationId) return;
 
     function step() {
-      if (!activeAiBubble || activeAiBubble.dataset.isImage === "true") {
+      if (!activeAiBubble) {
         typingAnimationId = null;
         return;
       }
@@ -227,7 +227,19 @@
       };
 
       window.ServerConnector.onServerMessage = function (payload) {
-        if (!payload || payload.requestId !== activeRequestId) return;
+        if (!payload) return;
+
+        if (payload.type === "EMOTION_UPDATE" && payload.emotions) {
+          window.EmotionService.updateEmotions(payload.emotions);
+          return;
+        }
+
+        if (payload.type === "MEMORY_UPDATE" && payload.memory) {
+          window.MemoryService.addMemory(payload.memory);
+          return;
+        }
+
+        if (payload.requestId !== activeRequestId) return;
 
         if (payload.type === "QUEUED" || payload.type === "PROCESSING") {
           resetStallTimer();
@@ -245,38 +257,8 @@
           return;
         }
 
-        if (payload.type === "IMAGE") {
-          resetStallTimer();
-          if (activeAiBubble) {
-            activeAiBubble.dataset.isImage = "true";
-            activeAiBubble.innerHTML = "";
-
-            const generatedImage = document.createElement("img");
-            generatedImage.className = "generated-image";
-            generatedImage.src = payload.imageUrl;
-            generatedImage.alt = payload.caption || "Generated Image";
-
-            activeAiBubble.appendChild(generatedImage);
-
-            if (payload.caption) {
-              const captionLine = document.createElement("p");
-              captionLine.style.fontSize = "12px";
-              captionLine.style.color = "var(--text-muted)";
-              captionLine.textContent = payload.caption;
-              activeAiBubble.appendChild(captionLine);
-            }
-
-            scrollChatToBottom();
-          }
-          return;
-        }
-
         if (payload.type === "RESPONSE_COMPLETE") {
           resetStallTimer();
-          if (activeAiBubble && activeAiBubble.dataset.isImage === "true") {
-            finishRequest();
-            return;
-          }
           if (typeof payload.text === "string" && payload.text.length > 0) {
             targetMarkdown = payload.text;
           }
