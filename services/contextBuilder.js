@@ -25,11 +25,11 @@ EXAMPLE DIALOGUES:
       }
 
       contextPrompt += `CURRENT CHARACTER EMOTIONS (0-100 scale):
-- Respect: ${emotions.respect || 50}/100
-- Curiosity: ${emotions.curiosity || 50}/100
-- Mood: ${emotions.mood || 50}/100
-- Affection: ${emotions.affection || 50}/100
-- Trust: ${emotions.trust || 50}/100
+- Respect: ${emotions.respect || 5}/100
+- Curiosity: ${emotions.curiosity || 20}/100
+- Mood: ${emotions.mood || 60}/100
+- Affection: ${emotions.affection || 0}/100
+- Trust: ${emotions.trust || 0}/100
 
 USER PERSONA:
 - Name: ${userPersona.name || "User"}
