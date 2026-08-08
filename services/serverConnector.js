@@ -1,8 +1,8 @@
 (function () {
   const BROKER_URL = "wss://broker.emqx.io:8084/mqtt";
-  const HEARTBEAT_TOPICS = ["xaikra/servers/heartbeat", "xaida/servers/heartbeat"];
-  const DEACTIVATE_TOPICS = ["xaikra/servers/deactivate", "xaida/servers/deactivate"];
-  const PING_TOPIC = "xaikra/servers/ping";
+  const HEARTBEAT_TOPIC = "xaida/servers/heartbeat";
+  const DEACTIVATE_TOPIC = "xaida/servers/deactivate";
+  const PING_TOPIC = "xaida/servers/ping";
   const SERVER_TIMEOUT_MS = 12000;
   const WATCHDOG_TIMEOUT_MS = 5000;
 
@@ -32,7 +32,7 @@
 
   const tabId = Math.random().toString(36).substring(2, 6);
   const logicalClientId = storedUserId + "-" + tabId;
-  const clientResponseTopic = "xaikra/client/" + logicalClientId + "/response";
+  const clientResponseTopic = "xaida/client/" + logicalClientId + "/response";
 
   const discoveredServers = {};
 
@@ -74,7 +74,7 @@
       selectedModel = modelId;
       localStorage.setItem("xaikra_selected_model", modelId);
       leaveCurrentServer();
-      reportStatus("Looking for " + modelId + " server...", "waiting");
+      reportStatus("Looking for server...", "waiting");
       pickBestServer();
     },
 
@@ -92,26 +92,20 @@
         return false;
       }
 
-      const backendModelId = selectedModel.replace("xaikra", "xaida");
+      const backendModelId = selectedModel === "xaikra-1.3" ? "xaida-1.3" : "xaida-2.1";
 
       const payloadString = JSON.stringify({
         clientId: logicalClientId,
         authKey: storedAuthKey,
         modelId: backendModelId,
         text: promptPayload.contextText,
-        rawPrompt: promptPayload.userText,
-        imageDataUrl: promptPayload.imageDataUrl || null,
+        imageDataUrl: null,
         requestId: promptPayload.requestId,
         replyTopic: clientResponseTopic,
         sentAt: Date.now()
       });
 
-      if (payloadString.length > 350000) {
-        return false;
-      }
-
       try {
-        relayClient.publish("xaikra/" + currentServer + "/prompt", payloadString, { qos: 0 });
         relayClient.publish("xaida/" + currentServer + "/prompt", payloadString, { qos: 0 });
         return true;
       } catch (e) {
@@ -151,10 +145,10 @@
   function joinServer(serverId) {
     leaveCurrentServer();
     currentServer = serverId;
-    currentResponseTopic = "xaikra/" + serverId + "/response/" + logicalClientId;
+    currentResponseTopic = "xaida/" + serverId + "/response/" + logicalClientId;
     if (relayClient && relayIsConnected) {
       relayClient.subscribe(currentResponseTopic);
-      reportStatus("Connected (" + serverId + ")", "online");
+      reportStatus("Online", "online");
     }
   }
 
@@ -167,14 +161,10 @@
       }
     });
 
-    const targetModelClean = selectedModel.replace("xaikra", "").replace("xaida", "");
-
     const healthyServers = [];
     Object.keys(discoveredServers).forEach(function (serverId) {
       const serverInfo = discoveredServers[serverId];
-      const serverModelClean = (serverInfo.modelId || "").replace("xaikra", "").replace("xaida", "");
-      
-      if ((serverModelClean === targetModelClean || !serverModelClean) && !serverInfo.isBusy) {
+      if (!serverInfo.isBusy) {
         healthyServers.push({ serverId: serverId, queueLength: serverInfo.queueLength });
       }
     });
@@ -188,7 +178,7 @@
 
     if (healthyServers.length === 0) {
       if (!currentServer) {
-        reportStatus("Searching for active AI node...", "waiting");
+        reportStatus("Searching for server...", "waiting");
       }
       return;
     }
@@ -264,17 +254,10 @@
       reportStatus("Scanning network", "waiting");
 
       relayClient.subscribe(clientResponseTopic);
-      
-      HEARTBEAT_TOPICS.forEach(function (topic) {
-        relayClient.subscribe(topic);
-      });
-      
-      DEACTIVATE_TOPICS.forEach(function (topic) {
-        relayClient.subscribe(topic);
-      });
+      relayClient.subscribe(HEARTBEAT_TOPIC);
+      relayClient.subscribe(DEACTIVATE_TOPIC);
 
       relayClient.publish(PING_TOPIC, "PING", { qos: 0 });
-      relayClient.publish("xaida/servers/ping", "PING", { qos: 0 });
     });
 
     relayClient.on("reconnect", function () {
@@ -299,7 +282,7 @@
         return;
       }
 
-      if (HEARTBEAT_TOPICS.indexOf(topic) !== -1) {
+      if (topic === HEARTBEAT_TOPIC) {
         if (!payload.serverId) return;
 
         if (payload.status === "offline" || payload.active === false || payload.deactivated === true) {
@@ -315,7 +298,7 @@
         );
 
         discoveredServers[payload.serverId] = {
-          modelId: payload.modelId || "xaikra-2.1",
+          modelId: payload.modelId || "xaida-2.1",
           queueLength: Number(payload.queueLength) || 0,
           isBusy: isBusy,
           lastSeen: Date.now()
@@ -325,7 +308,7 @@
         return;
       }
 
-      if (DEACTIVATE_TOPICS.indexOf(topic) !== -1) {
+      if (topic === DEACTIVATE_TOPIC) {
         if (payload.serverId) {
           removeServer(payload.serverId);
         }
