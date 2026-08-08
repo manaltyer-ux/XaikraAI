@@ -53,4 +53,3 @@ Malleus Draconia is the Housewarden of Diasomnia at Night Raven College and the 
 if (typeof window !== "undefined") {
   window.aiPersonality = aiPersonality;
 }
-}
