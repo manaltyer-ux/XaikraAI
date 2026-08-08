@@ -157,7 +157,7 @@
       }
       addNoteLine("Request timed out.", true);
       finishRequest();
-    }, 60000);
+    }, 80000);
   }
 
   function finishRequest() {
