@@ -1,9 +1,11 @@
+
 (function () {
   window.ContextBuilder = {
     buildAIContext: function (params) {
       const currentMessage = params.currentMessage || "";
       const recentMessages = params.recentMessages || [];
-      const memoryText = params.memoryText || "None";
+      const shortTermMemory = params.shortTermMemory || "";
+      const relevantLongTermMemories = params.relevantLongTermMemories || [];
       const emotions = params.emotions || {};
       const aiPersonality = params.aiPersonality || {};
       const userPersona = params.userPersona || {};
@@ -36,11 +38,22 @@ USER PERSONA:
 - Gender: ${userPersona.gender || "Not specified"}
 - Backstory: ${userPersona.backstory || "None"}
 
-AVAILABLE MEMORY:
-${memoryText}
+SHORT-TERM CONVERSATION MEMORY:
+${shortTermMemory.trim() ? shortTermMemory : "No short term memory yet."}
 
-RECENT CONVERSATION HISTORY:
+RELEVANT LONG-TERM MEMORIES:
 `;
+
+      if (relevantLongTermMemories.length > 0) {
+        contextPrompt += `Note: The following stored facts were matched by keywords and may or may not be directly related to the current moment. Use them only if relevant:\n`;
+        relevantLongTermMemories.forEach(function (m) {
+          contextPrompt += `- [KEYWORD: ${m.keyword}]: ${m.fact}\n`;
+        });
+      } else {
+        contextPrompt += "No relevant long-term memory found.\n";
+      }
+
+      contextPrompt += `\nRECENT CONVERSATION HISTORY:\n`;
 
       if (recentMessages.length) {
         recentMessages.forEach(function (msg) {
@@ -54,7 +67,7 @@ RECENT CONVERSATION HISTORY:
       contextPrompt += `\nCURRENT USER MESSAGE:
 ${currentMessage}
 
-Respond naturally as ${aiPersonality.name || "Xaikra"}, matching your current emotions, persona instructions, and conversation context.`;
+Respond naturally as ${aiPersonality.name || "Xaikra"}, matching your current emotions, persona instructions, and memory context.`;
 
       return contextPrompt;
     }
