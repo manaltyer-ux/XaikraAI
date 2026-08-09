@@ -1,25 +1,42 @@
+
 (function () {
   window.AIService = {
     sendMessage: function (userText, requestId) {
-      const currentEmotions = window.EmotionService.getEmotions();
-      const userPersona = window.UserPersona.get();
-      const recentMessages = window.Conversation.getRecent(5);
-      const memoryText = window.MemoryService.getFormattedMemoryText();
-      const personality = window.aiPersonality || {};
+      if (!window.ServerConnector || !window.ServerConnector.isReady()) return false;
 
-      const fullContext = window.ContextBuilder.buildAIContext({
+      const recentMessages = window.Conversation ? window.Conversation.getRecent(5) : [];
+
+      let previousAiMessage = "";
+      for (let i = recentMessages.length - 1; i >= 0; i--) {
+        if (recentMessages[i].role === "assistant" || recentMessages[i].role === "ai") {
+          previousAiMessage = recentMessages[i].text;
+          break;
+        }
+      }
+
+      const storedLTM = window.MemoryService ? window.MemoryService.getLongTermMemories() : [];
+      const relevantLTM = window.LTMMatcherService
+        ? window.LTMMatcherService.findRelevantMemories(userText, previousAiMessage, storedLTM)
+        : [];
+
+      const shortTermMemory = window.MemoryService ? window.MemoryService.getShortTermMemory() : "";
+
+      const contextText = window.ContextBuilder ? window.ContextBuilder.buildAIContext({
         currentMessage: userText,
         recentMessages: recentMessages,
-        memoryText: memoryText,
-        emotions: currentEmotions,
-        aiPersonality: personality,
-        userPersona: userPersona
-      });
+        shortTermMemory: shortTermMemory,
+        relevantLongTermMemories: relevantLTM,
+        emotions: window.EmotionService ? window.EmotionService.getEmotions() : {},
+        aiPersonality: window.aiPersonality || {},
+        userPersona: window.userPersona || {}
+      }) : userText;
 
-      return window.ServerConnector.sendPromptPayload({
-        contextText: fullContext,
-        userText: userText,
-        requestId: requestId
+      return window.ServerConnector.send({
+        type: "GENERATE",
+        requestId: requestId,
+        contextText: contextText,
+        recentMessages: recentMessages,
+        shortTermMemory: shortTermMemory
       });
     }
   };
