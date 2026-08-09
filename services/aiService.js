@@ -1,4 +1,3 @@
-
 ;(function () {
   window.AIService = {
     sendMessage: function (userText, requestId) {
