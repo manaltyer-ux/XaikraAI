@@ -4,7 +4,7 @@
   const defaultPersona = {
     name: "Alex",
     gender: "Not specified",
-    backstory: "A curious explorer who enjoys engaging conversations."
+    backstory: "a human"
   };
 
   function loadPersona() {
