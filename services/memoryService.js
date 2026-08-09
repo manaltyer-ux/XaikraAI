@@ -8,7 +8,17 @@
 
     addMemory: function (fact) {
       if (fact && typeof fact === "string") {
-        memories.push(fact.trim());
+        const cleanFact = fact.trim();
+
+        if (!cleanFact) return;
+/////// memory checker boi
+        const isDuplicate = memories.some(function (existing) {
+          return existing.toLowerCase() === cleanFact.toLowerCase();
+        });
+
+        if (!isDuplicate) {
+          memories.push(cleanFact);
+        }
       }
     },
 
