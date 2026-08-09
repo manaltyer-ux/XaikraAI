@@ -1,7 +1,6 @@
 (function () {
-const SHARED_SECRET_KEY = "xaikra-e2ee-shared-secret-key-change-this";
+const SHARED_SECRET_KEY = "xaikra-e2ee-LLZoccxx7781%";
 
-// --- Encryption Utility (AES-256-GCM) ---
 let cachedCryptoKey = null;
 async function getCryptoKey() {
   if (cachedCryptoKey) return cachedCryptoKey;
