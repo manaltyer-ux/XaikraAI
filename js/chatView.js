@@ -135,7 +135,9 @@
       } else {
         if (isResponseComplete) {
           renderMarkdownText(targetMarkdown);
-          window.Conversation.add("assistant", targetMarkdown);
+          if (window.Conversation && window.Conversation.add) {
+            window.Conversation.add("assistant", targetMarkdown);
+          }
           typingAnimationId = null;
           finishRequest();
         } else {
@@ -185,7 +187,7 @@
 
   function sendCurrentMessage() {
     const userText = messageInput.value.trim();
-    if (!userText || activeRequestId || !window.ServerConnector.isReady()) return;
+    if (!userText || activeRequestId || !window.ServerConnector || !window.ServerConnector.isReady()) return;
 
     activeRequestId = "req-" + Date.now() + "-" + Math.random().toString(36).substring(2, 6);
     targetMarkdown = "";
@@ -193,14 +195,16 @@
     isResponseComplete = false;
 
     addUserRow(userText);
-    window.Conversation.add("user", userText);
+    if (window.Conversation && window.Conversation.add) {
+      window.Conversation.add("user", userText);
+    }
 
     activeAiBubble = addAiBubble();
 
-    const wasSent = window.AIService.sendMessage(userText, activeRequestId);
+    const wasSent = window.AIService && window.AIService.sendMessage(userText, activeRequestId);
 
     if (!wasSent) {
-      if (activeAiBubble) activeAiBubble.textContent = "Unable to route message to Xaikra AI server.";
+      if (activeAiBubble) activeAiBubble.textContent = "Unable to route message to AI server.";
       finishRequest();
       return;
     }
@@ -230,12 +234,34 @@
         if (!payload) return;
 
         if (payload.type === "EMOTION_UPDATE" && payload.emotions) {
-          window.EmotionService.updateEmotions(payload.emotions);
+          if (window.EmotionService && window.EmotionService.updateEmotions) {
+            window.EmotionService.updateEmotions(payload.emotions);
+          }
+          return;
+        }
+
+        if (payload.type === "SHORT_TERM_MEMORY_UPDATE" && payload.shortTermMemory !== undefined) {
+          if (window.MemoryService && window.MemoryService.setShortTermMemory) {
+            window.MemoryService.setShortTermMemory(payload.shortTermMemory);
+          }
+          return;
+        }
+
+        if (payload.type === "LONG_TERM_MEMORY_UPDATE" && payload.memory) {
+          if (window.MemoryService && window.MemoryService.addLongTermMemory) {
+            window.MemoryService.addLongTermMemory(payload.memory);
+          }
           return;
         }
 
         if (payload.type === "MEMORY_UPDATE" && payload.memory) {
-          window.MemoryService.addMemory(payload.memory);
+          if (window.MemoryService) {
+            if (typeof payload.memory === "object") {
+              window.MemoryService.addLongTermMemory(payload.memory);
+            } else {
+              window.MemoryService.setShortTermMemory(payload.memory);
+            }
+          }
           return;
         }
 
@@ -300,7 +326,9 @@
       if (firstGreeting) {
         const bubble = addAiBubble();
         bubble.textContent = firstGreeting;
-        window.Conversation.add("assistant", firstGreeting);
+        if (window.Conversation && window.Conversation.add) {
+          window.Conversation.add("assistant", firstGreeting);
+        }
       }
     },
     refreshSendAvailability: refreshSendAvailability
