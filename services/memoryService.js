@@ -1,34 +1,47 @@
+
 (function () {
-  const memories = [];
+  let shortTermMemory = "";
+  const longTermMemories = []; }
 
   window.MemoryService = {
-    getMemories: function () {
-      return memories.slice();
+    /////// short term
+    getShortTermMemory: function () {
+      return shortTermMemory;
     },
 
-    addMemory: function (fact) {
-      if (fact && typeof fact === "string") {
-        const cleanFact = fact.trim();
+    setShortTermMemory: function (text) {
+      if (typeof text === "string") {
+        shortTermMemory = text.trim();
+      }
+    },
 
-        if (!cleanFact) return;
-/////// memory checker boi
-        const isDuplicate = memories.some(function (existing) {
-          return existing.toLowerCase() === cleanFact.toLowerCase();
+    ///// long term memoryy 
+    getLongTermMemories: function () {
+      return longTermMemories.slice();
+    },
+
+    addLongTermMemory: function (memObject) {
+      if (!memObject || typeof memObject !== "object") return;
+      const { keyword, fact } = memObject;
+
+      if (!keyword || !fact) return;
+
+      const cleanKeyword = keyword.trim().toLowerCase();
+      const cleanFact = fact.trim();
+/////// check for duplicated boii
+      const isDuplicate = longTermMemories.some(function (existing) {
+        return (
+          existing.keyword.toLowerCase() === cleanKeyword ||
+          existing.fact.toLowerCase() === cleanFact.toLowerCase()
+        );
+      });
+
+      if (!isDuplicate) {
+        longTermMemories.push({
+          keyword: cleanKeyword,
+          fact: cleanFact
         });
-
-        if (!isDuplicate) {
-          memories.push(cleanFact);
-        }
       }
-    },
-
-    getFormattedMemoryText: function () {
-      if (memories.length === 0) {
-        return "No explicit stored memories yet.";
-      }
-      return memories.map(function (m, idx) {
-        return (idx + 1) + ". " + m;
-      }).join("\n");
     }
   };
 })();
