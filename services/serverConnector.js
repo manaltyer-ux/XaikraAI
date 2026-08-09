@@ -44,7 +44,7 @@ async function decryptPayload(rawMessageStr) {
   try {
     const parsed = JSON.parse(rawMessageStr);
     if (!parsed || !parsed.enc || !parsed.iv || !parsed.data) {
-      return parsed; // Fallback for plain unencrypted messages
+      return parsed;
     }
     const key = await getCryptoKey();
     const iv = base64ToBuffer(parsed.iv);
@@ -153,6 +153,8 @@ const ServerConnector = {
       authKey: storedAuthKey,
       modelId: backendModelId,
       text: promptPayload.contextText,
+      recentMessages: promptPayload.recentMessages || [],
+      shortTermMemory: promptPayload.shortTermMemory || "",
       imageDataUrl: null,
       requestId: promptPayload.requestId,
       replyTopic: clientResponseTopic,
