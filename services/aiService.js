@@ -1,9 +1,9 @@
 
-(function () {
+;(function () {
   window.AIService = {
     sendMessage: function (userText, requestId) {
       if (!window.ServerConnector) {
-        console.error("ServerConnector is missing.");
+        console.error("ServerConnector is missing from window.");
         return false;
       }
 
@@ -14,7 +14,6 @@
         recentMessages = window.Conversation.messages.slice(-5);
       }
 
-      
       var previousAiMessage = "";
       if (Array.isArray(recentMessages)) {
         for (var i = recentMessages.length - 1; i >= 0; i--) {
@@ -59,7 +58,6 @@
         });
       }
 
-      
       var payload = {
         type: "GENERATE",
         requestId: requestId,
@@ -68,28 +66,43 @@
         shortTermMemory: shortTermMemory
       };
 
-      if (typeof window.ServerConnector.sendMessage === "function") {
-        window.ServerConnector.sendMessage(payload);
-        return true;
-      }
-      if (typeof window.ServerConnector.sendPayload === "function") {
-        window.ServerConnector.sendPayload(payload);
-        return true;
-      }
-      if (typeof window.ServerConnector.send === "function") {
-        window.ServerConnector.send(payload);
-        return true;
-      }
-      if (window.ServerConnector.ws && typeof window.ServerConnector.ws.send === "function") {
-        window.ServerConnector.ws.send(JSON.stringify(payload));
-        return true;
-      }
-      if (window.ServerConnector.socket && typeof window.ServerConnector.socket.send === "function") {
-        window.ServerConnector.socket.send(JSON.stringify(payload));
-        return true;
+      return this.dispatchToServer(payload);
+    },
+
+    dispatchToServer: function (payload) {
+      var sc = window.ServerConnector;
+      if (!sc) return false;
+
+      var methodNames = ["sendRequest", "sendMessage", "sendPayload", "send", "emit", "dispatch", "sendData", "postMessage", "post"];
+      for (var i = 0; i < methodNames.length; i++) {
+        var fnName = methodNames[i];
+        if (typeof sc[fnName] === "function") {
+          sc[fnName](payload);
+          return true;
+        }
       }
 
-      console.error("ServerConnector has no recognizable send method.");
+      var socketObjs = [sc.ws, sc.socket, sc.conn, sc.connection, sc.client];
+      for (var j = 0; j < socketObjs.length; j++) {
+        var sock = socketObjs[j];
+        if (sock && typeof sock.send === "function") {
+          sock.send(JSON.stringify(payload));
+          return true;
+        }
+      }
+
+      var keys = Object.keys(sc);
+      for (var k = 0; k < keys.length; k++) {
+        var key = keys[k];
+        if (typeof sc[key] === "function" && key !== "isReady" && !key.startsWith("on")) {
+          try {
+            sc[key](payload);
+            return true;
+          } catch (e) {}
+        }
+      }
+
+      console.error("[AIService] Could not locate send method on ServerConnector. Available keys on ServerConnector:", Object.keys(sc));
       return false;
     }
   };
