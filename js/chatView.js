@@ -106,7 +106,28 @@
     scrollChatToBottom();
   }
 
+  function forceCompleteResponse() {
+    if (typingAnimationId) {
+      cancelAnimationFrame(typingAnimationId);
+      typingAnimationId = null;
+    }
+
+    displayedMarkdown = targetMarkdown;
+    renderMarkdownText(displayedMarkdown);
+
+    if (window.Conversation && window.Conversation.add && targetMarkdown) {
+      window.Conversation.add("assistant", targetMarkdown);
+    }
+
+    finishRequest();
+  }
+
   function startTypingLoop() {
+    if (isResponseComplete && displayedMarkdown.length >= targetMarkdown.length) {
+      forceCompleteResponse();
+      return;
+    }
+
     if (typingAnimationId) return;
 
     function step() {
@@ -124,7 +145,7 @@
         else if (remainingChars > 20) charsToAdd = 2;
 
         if (isResponseComplete) {
-          charsToAdd = Math.max(charsToAdd, Math.ceil(remainingChars / 4));
+          charsToAdd = Math.max(charsToAdd, Math.ceil(remainingChars / 3));
         }
 
         const nextLength = displayedMarkdown.length + charsToAdd;
@@ -133,15 +154,9 @@
         renderMarkdownText(displayedMarkdown);
         typingAnimationId = requestAnimationFrame(step);
       } else {
+        typingAnimationId = null;
         if (isResponseComplete) {
-          renderMarkdownText(targetMarkdown);
-          if (window.Conversation && window.Conversation.add) {
-            window.Conversation.add("assistant", targetMarkdown);
-          }
-          typingAnimationId = null;
-          finishRequest();
-        } else {
-          typingAnimationId = null;
+          forceCompleteResponse();
         }
       }
     }
@@ -154,10 +169,10 @@
     stallTimer = setTimeout(function () {
       if (!activeRequestId) return;
       if (typingAnimationId) cancelAnimationFrame(typingAnimationId);
-      if (activeAiBubble) {
+      if (activeAiBubble && !displayedMarkdown) {
         activeAiBubble.textContent = "Connection timed out while waiting for AI response.";
+        addNoteLine("Request timed out.", true);
       }
-      addNoteLine("Request timed out.", true);
       finishRequest();
     }, 80000);
   }
@@ -264,8 +279,10 @@
           }
           return;
         }
-
-        if (payload.requestId !== activeRequestId) return;
+        const incomingReqId = payload.requestId || payload.request_id;
+        if (activeRequestId && incomingReqId && String(incomingReqId) !== String(activeRequestId)) {
+          return;
+        }
 
         if (payload.type === "QUEUED" || payload.type === "PROCESSING") {
           resetStallTimer();
@@ -283,13 +300,28 @@
           return;
         }
 
-        if (payload.type === "RESPONSE_COMPLETE") {
+        const isCompletionType = [
+          "RESPONSE_COMPLETE",
+          "COMPLETE",
+          "DONE",
+          "FINISHED",
+          "END"
+        ].includes(payload.type);
+
+        if (isCompletionType) {
           resetStallTimer();
           if (typeof payload.text === "string" && payload.text.length > 0) {
             targetMarkdown = payload.text;
           }
           isResponseComplete = true;
-          startTypingLoop();
+
+          if (document.hidden || displayedMarkdown.length >= targetMarkdown.length) {
+            forceCompleteResponse();
+          } else {
+            if (typingAnimationId) cancelAnimationFrame(typingAnimationId);
+            typingAnimationId = null;
+            startTypingLoop();
+          }
           return;
         }
 
@@ -300,6 +332,13 @@
         }
       };
     }
+
+    // Safety check if user switches tabs mid-response
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden && activeRequestId && isResponseComplete) {
+        forceCompleteResponse();
+      }
+    });
 
     if (sendButton) sendButton.addEventListener("click", sendCurrentMessage);
 
